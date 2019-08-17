@@ -5,6 +5,7 @@ import com.yuan.entity.TreeNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -186,5 +187,229 @@ public class OfferSolution {
             jumpNums[i] = jumpNums[i - 1] + jumpNums[i - 2];
         }
         return jumpNums[target - 1];
+    }
+
+    /**
+     * 剑指offer-09
+     */
+    public int jumpFloorII(int target) {
+        if (target == 0) {
+            return 0;
+        }
+        return (int)Math.pow(2, target - 1);
+    }
+
+    /**
+     * 剑指offer-10 同斐波那契数列
+     */
+    public int rectCover(int target) {
+        if (target == 0) {
+            return 0;
+        }
+        if (target <= 2) {
+            return target == 2? 2: 1;
+        }
+        int[] methods = new int[target];
+        methods[0] = 1;
+        methods[1] = 2;
+        for (int i = 2; i < target; i++) {
+            methods[i] = methods[i - 2] + methods[i - 1];
+        }
+        return methods[target - 1];
+    }
+
+    /**
+     * 剑指offer-11 输出二进制中1的个数
+     */
+    public int numberOf1(int n) {
+        int cnts = 0;
+        while (n != 0) {
+            cnts++;
+            n = n & (n - 1);
+        }
+        return cnts;
+    }
+
+
+    /**
+     * 剑指offer-12 注意负指数
+     * @param base 基数
+     * @param exponent 指数
+     */
+    public double power(double base, int exponent) {
+        boolean negaFlag = false;
+        if (exponent < 0) {
+            exponent = -1 * exponent;
+            negaFlag = true;
+
+        }
+        if (exponent == 0) {
+            return 1;
+        } else if (exponent == 1) {
+            if (negaFlag) {
+                return 1 / base;
+            }
+            return base;
+        } else if (exponent % 2 == 1) {
+            if (negaFlag) {
+                return 1 / (power(base, (exponent - 1) / 2 ) * power(base, (exponent - 1) / 2 ) * base);
+            }
+            return power(base, (exponent - 1) / 2 ) * power(base, (exponent - 1) / 2 ) * base;
+        } else {
+            if (negaFlag) {
+                return 1 / (power(base, exponent / 2) * power(base, exponent / 2));
+            }
+            return power(base, exponent / 2) * power(base, exponent / 2);
+        }
+    }
+
+    /**
+     * 剑指offer-13 改变数组中的顺序，奇数在前 偶数在后 注意算法的稳定性
+     */
+    public void reOrderArray(int [] array) {
+        if (array.length == 0) {
+            return;
+        }
+        int odd = 0, even = 0;
+        while (even < array.length && array[even] % 2 == 1) {
+            even++;
+        }
+        odd = even;
+        while (odd < array.length) {
+            while (odd < array.length && array[odd] % 2 == 0) {
+                odd++;
+            }
+            if (odd < array.length) {
+                int evenLen = odd - even;
+                int oddIdx = odd;
+                while (odd < array.length && array[odd] % 2 == 1) {
+                    odd++;
+                }
+                int oddLen = odd - oddIdx;
+                changeLocalOrder(array, even, evenLen, oddIdx, oddLen);
+
+                even = even + oddLen;
+            }
+        }
+    }
+
+    private void changeLocalOrder(int [] array, int evenIdx, int evenLen, int oddIdx, int oddLen) {
+        int [] tempArr = new int[oddLen];
+        System.arraycopy(array, oddIdx, tempArr, 0, oddLen);
+        System.arraycopy(array, evenIdx, array, evenIdx + oddLen, evenLen);
+        System.arraycopy(tempArr, 0, array, evenIdx, oddLen);
+    }
+
+    /**
+     * 剑指offer-14 倒数第k个节点 两个指针即可
+     * @param head 头结点
+     * @param k 倒数第k个
+     */
+    public ListNode findKthToTail(ListNode head,int k) {
+        if (head == null) {
+            return null;
+        }
+        ListNode pre = head;
+        ListNode fol = head;
+        for (int i = 0; i < k; i++) {
+            if (fol == null) {
+                return null;
+            } else {
+                fol = fol.next;
+            }
+        }
+        while (fol != null) {
+            pre = pre.next;
+            fol = fol.next;
+        }
+        return pre;
+    }
+
+    /**
+     * 剑指offer-15 反转链表
+     * @param head 头结点
+     * @return 新链表的表头
+     */
+    public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode sentinel = new ListNode(0);
+        sentinel.next = head;
+        while (head.next != null) {
+            ListNode cur = head.next;
+            head.next = cur.next;
+            cur.next = sentinel.next;
+            sentinel.next = cur;
+        }
+        return sentinel.next;
+    }
+
+    /**
+     * 剑指offer-16 合成单调链表
+     * @param list1 单调递增链表1
+     * @param list2 单调递增链表2
+     * @return 新链表表头
+     */
+    public ListNode merge(ListNode list1,ListNode list2) {
+        ListNode sentinel = new ListNode(0);
+        ListNode cur = sentinel;
+        while (list1 != null && list2 != null) {
+            if (list1.val <= list2.val) {
+                cur.next = list1;
+                list1 = list1.next;
+            } else {
+                cur.next = list2;
+                list2 = list2.next;
+            }
+            cur = cur.next;
+        }
+        if (list1 != null) {
+            cur.next = list1;
+        } else {
+            cur.next = list2;
+        }
+        return sentinel.next;
+    }
+
+    /**
+     * 剑指offer-17 判断root2是不是root1的子结构，规定空树不是任何树的子结构
+     * 递归判断
+     */
+    public boolean hasSubtree(TreeNode root1,TreeNode root2) {
+        if (root2 == null || root1 == null) {
+            return false;
+        }
+        return hasSubTreeDFS(root1, root2) || hasSubTreeDFS(root1.left, root2)
+                || hasSubTreeDFS(root1.right, root2);
+    }
+
+    private boolean hasSubTreeDFS(TreeNode root1,TreeNode root2) {
+        if (root2 == null) {
+            return true;
+        }
+        if (root1 == null) {
+            return false;
+        }
+        if (root1.val == root2.val && hasSubTreeDFS(root1.left, root2.left) && hasSubTreeDFS(root1.right, root2.right)) {
+            return true;
+        } else {
+            return hasSubTreeDFS(root1.left, root2) || hasSubTreeDFS(root1.right, root2);
+        }
+    }
+
+    /**
+     * 剑指offer-18 镜像反转二叉树
+     * 递归反转
+     */
+    public void mirror(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        mirror(root.left);
+        mirror(root.right);
     }
 }
