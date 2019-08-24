@@ -2,11 +2,9 @@ package com.yuan.solution;
 
 import com.yuan.entity.ListNode;
 import com.yuan.entity.TreeNode;
+import sun.util.resources.cldr.zh.CalendarData_zh_Hans_HK;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * @author yuan
@@ -384,7 +382,7 @@ public class OfferSolution {
                 || hasSubTreeDFS(root1.right, root2);
     }
 
-    private boolean hasSubTreeDFS(TreeNode root1,TreeNode root2) {
+    public boolean hasSubTreeDFS(TreeNode root1,TreeNode root2) {
         if (root2 == null) {
             return true;
         }
@@ -411,5 +409,127 @@ public class OfferSolution {
         root.right = temp;
         mirror(root.left);
         mirror(root.right);
+    }
+
+    /**
+     * 剑指offer-19 顺时针打印矩阵
+     * 注意处理特殊情况
+     */
+    public ArrayList<Integer> printMatrix(int [][] matrix) {
+        if (matrix.length == 0 || matrix[0].length == 0) {
+            return new ArrayList<>();
+        }
+        int rowSt = 0, rowEnd = matrix.length - 1, colSt = 0, colEnd = matrix[0].length - 1;
+        ArrayList<Integer> result = new ArrayList<>();
+        while (rowSt < rowEnd && colSt < colEnd) {
+            int colId = colSt;
+            while (colId < colEnd) {
+                result.add(matrix[rowSt][colId]);
+                colId++;
+            }
+            int rowId = rowSt;
+            while (rowId < rowEnd) {
+                result.add(matrix[rowId][colEnd]);
+                rowId++;
+            }
+            while (colSt < colId) {
+                result.add(matrix[rowEnd][colId]);
+                colId--;
+            }
+            while (rowSt < rowId) {
+                result.add(matrix[rowId][colSt]);
+                rowId--;
+            }
+
+            rowSt++;
+            colSt++;
+            rowEnd--;
+            colEnd--;
+        }
+        if (rowSt == rowEnd && colSt == colEnd) {
+            result.add(matrix[rowSt][colSt]);
+        } else if (rowSt == rowEnd && colSt < colEnd) {
+            while (colSt <= colEnd) {
+                result.add(matrix[rowSt][colSt]);
+                colSt++;
+            }
+        } else if (rowSt < rowEnd && colSt == colEnd) {
+            while (rowSt <= rowEnd) {
+                result.add(matrix[rowSt][colSt]);
+                rowSt++;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 剑指offer-20 最小元素栈
+     * 只用一个栈实现，注意最小值
+     */
+    class minStack{
+
+        private Stack<Integer> stack = new Stack<>();
+        private int minVal = 0;
+
+        public void push(int node) {
+            if (stack.isEmpty()) {
+                stack.push(node);
+                minVal = node;
+            } else {
+                if (node < minVal) {
+                    stack.push(minVal);
+                    stack.push(node);
+                    minVal = node;
+                } else {
+                    stack.push(node);
+                }
+            }
+        }
+
+        public void pop() {
+            int popVal = stack.pop();
+            if (popVal == minVal) {
+                minVal = stack.pop();
+            }
+        }
+
+        public int top() {
+            return stack.peek();
+        }
+
+        public int min() {
+            return minVal;
+        }
+    }
+
+    /**
+     * 剑指offer-21 栈的压入序列
+     * 辅助栈
+     */
+    public boolean isPopOrder(int [] pushA,int [] popA) {
+        Stack<Integer> stack = new Stack<>();
+        int popIdx = 0;
+        for (int i = 0; i < pushA.length; i++) {
+            if (pushA[i] != popA[popIdx]) {
+                stack.push(pushA[i]);
+            } else {
+                popIdx++;
+            }
+        }
+        while (popIdx != popA.length) {
+            if (popA[popIdx] != stack.pop()) {
+                return false;
+            } else {
+                popIdx++;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 剑指offer-22 从上到下打印二叉树
+     */
+    public ArrayList<Integer> printFromTopToBottom(TreeNode root) {
+        return null;
     }
 }
