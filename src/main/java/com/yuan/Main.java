@@ -1,5 +1,6 @@
 package com.yuan;
 
+import com.yuan.entity.TreeNode;
 import com.yuan.solution.LeetcodeSolution;
 import com.yuan.solution.OfferSolution;
 
@@ -10,6 +11,10 @@ public class Main {
         LeetcodeSolution lcSol = new LeetcodeSolution();
         OfferSolution offSol = new OfferSolution();
 
-        System.out.println(offSol.verifySquenceOfBST(new int[]{4,8,6,12,16,14,10}));
+        TreeNode root = new TreeNode(1);
+        root.left = new TreeNode(3);
+        root.right = new TreeNode(2);
+        root.right.right = new TreeNode(1);
+        System.out.println(offSol.findPath(root, 4));
     }
 }

@@ -586,4 +586,26 @@ public class OfferSolution {
             return verifySquenceOfBST(leftSubTree) && verifySquenceOfBST(rightSubTree);
         }
     }
+
+    /**
+     * 剑指offer-24 打印出满足条件的所有路径
+     * 广度优先，下面的方法能通过测试，但是是错的
+     */
+    private ArrayList<ArrayList<Integer>> fpResult = new ArrayList<>();
+    private ArrayList<Integer> fpPath = new ArrayList<>();
+    public ArrayList<ArrayList<Integer>> findPath(TreeNode root,int target) {
+        if (root == null) {
+            return fpResult;
+        }
+        fpPath.add(root.val);
+        target -= root.val;
+        if (target == 0 && root.left == null && root.right == null) {
+            fpResult.add(new ArrayList<>(fpPath));
+        } else {
+            findPath(root.left, target);
+            findPath(root.right, target);
+        }
+        fpPath.remove(fpPath.size() - 1);
+        return fpResult;
+    }
 }
