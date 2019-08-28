@@ -3,10 +3,7 @@ package com.yuan.solution;
 import com.yuan.entity.ListNode;
 import com.yuan.entity.TreeNode;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * @author yuan
@@ -384,7 +381,7 @@ public class OfferSolution {
                 || hasSubTreeDFS(root1.right, root2);
     }
 
-    private boolean hasSubTreeDFS(TreeNode root1,TreeNode root2) {
+    public boolean hasSubTreeDFS(TreeNode root1,TreeNode root2) {
         if (root2 == null) {
             return true;
         }
@@ -415,8 +412,200 @@ public class OfferSolution {
 
     /**
      * 剑指offer-19 顺时针打印矩阵
+     * 注意处理特殊情况
      */
     public ArrayList<Integer> printMatrix(int [][] matrix) {
+        if (matrix.length == 0 || matrix[0].length == 0) {
+            return new ArrayList<>();
+        }
+        int rowSt = 0, rowEnd = matrix.length - 1, colSt = 0, colEnd = matrix[0].length - 1;
+        ArrayList<Integer> result = new ArrayList<>();
+        while (rowSt < rowEnd && colSt < colEnd) {
+            int colId = colSt;
+            while (colId < colEnd) {
+                result.add(matrix[rowSt][colId]);
+                colId++;
+            }
+            int rowId = rowSt;
+            while (rowId < rowEnd) {
+                result.add(matrix[rowId][colEnd]);
+                rowId++;
+            }
+            while (colSt < colId) {
+                result.add(matrix[rowEnd][colId]);
+                colId--;
+            }
+            while (rowSt < rowId) {
+                result.add(matrix[rowId][colSt]);
+                rowId--;
+            }
 
+            rowSt++;
+            colSt++;
+            rowEnd--;
+            colEnd--;
+        }
+        if (rowSt == rowEnd && colSt == colEnd) {
+            result.add(matrix[rowSt][colSt]);
+        } else if (rowSt == rowEnd && colSt < colEnd) {
+            while (colSt <= colEnd) {
+                result.add(matrix[rowSt][colSt]);
+                colSt++;
+            }
+        } else if (rowSt < rowEnd && colSt == colEnd) {
+            while (rowSt <= rowEnd) {
+                result.add(matrix[rowSt][colSt]);
+                rowSt++;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 剑指offer-20 最小元素栈
+     * 只用一个栈实现，注意最小值
+     */
+    class minStack{
+
+        private Stack<Integer> stack = new Stack<>();
+        private int minVal = 0;
+
+        public void push(int node) {
+            if (stack.isEmpty()) {
+                stack.push(node);
+                minVal = node;
+            } else {
+                if (node < minVal) {
+                    stack.push(minVal);
+                    stack.push(node);
+                    minVal = node;
+                } else {
+                    stack.push(node);
+                }
+            }
+        }
+
+        public void pop() {
+            int popVal = stack.pop();
+            if (popVal == minVal) {
+                minVal = stack.pop();
+            }
+        }
+
+        public int top() {
+            return stack.peek();
+        }
+
+        public int min() {
+            return minVal;
+        }
+    }
+
+    /**
+     * 剑指offer-21 栈的压入序列
+     * 辅助栈
+     */
+    public boolean isPopOrder(int [] pushA,int [] popA) {
+        Stack<Integer> stack = new Stack<>();
+        int popIdx = 0;
+        for (int i = 0; i < pushA.length; i++) {
+            if (pushA[i] != popA[popIdx]) {
+                stack.push(pushA[i]);
+            } else {
+                popIdx++;
+            }
+        }
+        while (popIdx != popA.length) {
+            if (popA[popIdx] != stack.pop()) {
+                return false;
+            } else {
+                popIdx++;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 剑指offer-22 从上到下打印二叉树
+     */
+    public ArrayList<Integer> printFromTopToBottom(TreeNode root) {
+        if (root == null) {
+            return new ArrayList<>();
+        }
+        ArrayList<Integer> result = new ArrayList<>();
+        Queue<TreeNode> nodes = new LinkedList<>();
+        nodes.add(root);
+        while (!nodes.isEmpty()) {
+            TreeNode curNode = nodes.poll();
+            if (curNode.left != null) {
+                nodes.add(curNode.left);
+            }
+            if (curNode.right != null) {
+                nodes.add(curNode.right);
+            }
+            result.add(curNode.val);
+        }
+        return result;
+    }
+
+    /**
+     * 剑指offer-23 判断是否是二叉搜索树的后序遍历
+     * 后序遍历的最后一个节点为根节点
+     */
+    public boolean verifySquenceOfBST(int [] sequence) {
+        if (sequence == null || sequence.length <= 1) {
+            return true;
+        }
+        int rootVal = sequence[sequence.length - 1];
+        int leftSubTreeIdx = 0;
+        while (leftSubTreeIdx < sequence.length - 1) {
+            if (rootVal < sequence[leftSubTreeIdx]) {
+                break;
+            } else {
+                leftSubTreeIdx++;
+            }
+        }
+        int rightSubTreeIdx = leftSubTreeIdx;
+        while (rightSubTreeIdx < sequence.length - 1) {
+            if (sequence[rightSubTreeIdx] < rootVal) {
+                return false;
+            } else {
+                rightSubTreeIdx++;
+            }
+        }
+        rightSubTreeIdx--;
+        if (leftSubTreeIdx == sequence.length - 1 || leftSubTreeIdx == 0) {
+            int [] subTree = new int[leftSubTreeIdx + 1];
+            System.arraycopy(sequence, 0, subTree, 0, subTree.length);
+            return verifySquenceOfBST(subTree);
+        } else {
+            int [] leftSubTree = new int[leftSubTreeIdx];
+            int [] rightSubTree = new int[rightSubTreeIdx - leftSubTreeIdx + 1];
+            System.arraycopy(sequence, 0, leftSubTree, 0, leftSubTree.length);
+            System.arraycopy(sequence, leftSubTreeIdx, rightSubTree, 0, rightSubTree.length);
+            return verifySquenceOfBST(leftSubTree) && verifySquenceOfBST(rightSubTree);
+        }
+    }
+
+    /**
+     * 剑指offer-24 打印出满足条件的所有路径
+     * 广度优先，下面的方法能通过测试，但是是错的
+     */
+    private ArrayList<ArrayList<Integer>> fpResult = new ArrayList<>();
+    private ArrayList<Integer> fpPath = new ArrayList<>();
+    public ArrayList<ArrayList<Integer>> findPath(TreeNode root,int target) {
+        if (root == null) {
+            return fpResult;
+        }
+        fpPath.add(root.val);
+        target -= root.val;
+        if (target == 0 && root.left == null && root.right == null) {
+            fpResult.add(new ArrayList<>(fpPath));
+        } else {
+            findPath(root.left, target);
+            findPath(root.right, target);
+        }
+        fpPath.remove(fpPath.size() - 1);
+        return fpResult;
     }
 }
