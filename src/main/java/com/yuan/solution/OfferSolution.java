@@ -2,7 +2,6 @@ package com.yuan.solution;
 
 import com.yuan.entity.ListNode;
 import com.yuan.entity.TreeNode;
-import sun.util.resources.cldr.zh.CalendarData_zh_Hans_HK;
 
 import java.util.*;
 
@@ -530,6 +529,61 @@ public class OfferSolution {
      * 剑指offer-22 从上到下打印二叉树
      */
     public ArrayList<Integer> printFromTopToBottom(TreeNode root) {
-        return null;
+        if (root == null) {
+            return new ArrayList<>();
+        }
+        ArrayList<Integer> result = new ArrayList<>();
+        Queue<TreeNode> nodes = new LinkedList<>();
+        nodes.add(root);
+        while (!nodes.isEmpty()) {
+            TreeNode curNode = nodes.poll();
+            if (curNode.left != null) {
+                nodes.add(curNode.left);
+            }
+            if (curNode.right != null) {
+                nodes.add(curNode.right);
+            }
+            result.add(curNode.val);
+        }
+        return result;
+    }
+
+    /**
+     * 剑指offer-23 判断是否是二叉搜索树的后序遍历
+     * 后序遍历的最后一个节点为根节点
+     */
+    public boolean verifySquenceOfBST(int [] sequence) {
+        if (sequence == null || sequence.length <= 1) {
+            return true;
+        }
+        int rootVal = sequence[sequence.length - 1];
+        int leftSubTreeIdx = 0;
+        while (leftSubTreeIdx < sequence.length - 1) {
+            if (rootVal < sequence[leftSubTreeIdx]) {
+                break;
+            } else {
+                leftSubTreeIdx++;
+            }
+        }
+        int rightSubTreeIdx = leftSubTreeIdx;
+        while (rightSubTreeIdx < sequence.length - 1) {
+            if (sequence[rightSubTreeIdx] < rootVal) {
+                return false;
+            } else {
+                rightSubTreeIdx++;
+            }
+        }
+        rightSubTreeIdx--;
+        if (leftSubTreeIdx == sequence.length - 1 || leftSubTreeIdx == 0) {
+            int [] subTree = new int[leftSubTreeIdx + 1];
+            System.arraycopy(sequence, 0, subTree, 0, subTree.length);
+            return verifySquenceOfBST(subTree);
+        } else {
+            int [] leftSubTree = new int[leftSubTreeIdx];
+            int [] rightSubTree = new int[rightSubTreeIdx - leftSubTreeIdx + 1];
+            System.arraycopy(sequence, 0, leftSubTree, 0, leftSubTree.length);
+            System.arraycopy(sequence, leftSubTreeIdx, rightSubTree, 0, rightSubTree.length);
+            return verifySquenceOfBST(leftSubTree) && verifySquenceOfBST(rightSubTree);
+        }
     }
 }

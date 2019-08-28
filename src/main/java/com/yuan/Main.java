@@ -10,7 +10,6 @@ public class Main {
         LeetcodeSolution lcSol = new LeetcodeSolution();
         OfferSolution offSol = new OfferSolution();
 
-        offSol.isPopOrder(new int[]{1,2,3,4,5}, new int[]{4,5,1,2,3});
+        System.out.println(offSol.verifySquenceOfBST(new int[]{4,8,6,12,16,14,10}));
     }
-
 }
