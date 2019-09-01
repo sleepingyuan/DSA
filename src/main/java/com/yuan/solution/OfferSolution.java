@@ -612,32 +612,120 @@ public class OfferSolution {
 
     /**
      * 剑指offer-25 复杂链表的复制
+     * 维护一个新旧节点的映射关系，两轮遍历
      */
     public RandomListNode clone(RandomListNode pHead) {
         if (pHead == null) {
             return null;
         }
-        Map<Integer, RandomListNode> random2ori = new HashMap<>();
-        RandomListNode cloneHead = new RandomListNode(pHead.label);
-        RandomListNode current = cloneHead;
-        while (pHead != null) {
-            if (random2ori.get(pHead.label) != null) {
-                current = random2ori.get(pHead.label);
-            } else {
-                current.label = pHead.label;
-                if (pHead.next != null) {
-                    current.next = new RandomListNode(pHead.next.label);
-                }
-                if (pHead.random != null) {
-                    current.random = new RandomListNode(pHead.random.label);
-                }
-            }
-            if (current.random != null) {
-                random2ori.put(current.random.label, current.random);
-            }
-            pHead = pHead.next;
-            current = current.next;
+        Map<RandomListNode, RandomListNode> oldToNew = new HashMap<>();
+        RandomListNode oldNode = pHead;
+        RandomListNode newHead = new RandomListNode(oldNode.label);
+        RandomListNode newNode = newHead;
+        oldToNew.put(oldNode, newNode);
+        oldNode = oldNode.next;
+        while (oldNode != null) {
+            newNode.next = new RandomListNode(oldNode.label);
+            newNode = newNode.next;
+            oldToNew.put(oldNode, newNode);
+            oldNode = oldNode.next;
         }
-        return cloneHead;
+        oldNode = pHead;
+        newNode = newHead;
+        while (oldNode != null) {
+            newNode.random = oldToNew.getOrDefault(oldNode.random, null);
+            oldNode = oldNode.next;
+            newNode = newNode.next;
+        }
+        return newHead;
+    }
+
+    /**
+     * 剑指offer-26 二叉树转双向链表
+     * 递归
+     */
+    public TreeNode convert(TreeNode pRootOfTree) {
+        if (pRootOfTree == null) {
+            return null;
+        }
+        return convertHelper(pRootOfTree)[0];
+    }
+
+    private TreeNode[] convertHelper(TreeNode node) {
+        if (node.left == null && node.right == null) {
+            return new TreeNode[]{node, node};
+        } else if (node.left != null && node.right == null) {
+            TreeNode[] left = convertHelper(node.left);
+            left[1].right = node;
+            node.left = left[1];
+            return new TreeNode[]{left[0], node};
+        } else if (node.left == null) {
+            TreeNode[] right = convertHelper(node.right);
+            right[0].left = node;
+            node.right = right[0];
+            return new TreeNode[]{node, right[1]};
+        } else {
+            TreeNode[] left = convertHelper(node.left);
+            TreeNode[] right = convertHelper(node.right);
+            left[1].right = node;
+            node.left = left[1];
+            right[0].left = node;
+            node.right = right[0];
+            return new TreeNode[]{left[0], right[1]};
+        }
+    }
+
+    /**
+     * 剑指offer-27 按字典序打印所有排列
+     */
+    public ArrayList<String> permutation(String str) {
+        ArrayList<String> result = new ArrayList<>();
+        for (int i = 0; i < str.length(); i++) {
+            permutationHelper(str.toCharArray(), i, result);
+            Collections.sort(result);
+        }
+        return result;
+    }
+
+    private void permutationHelper(char[] cs, int idx , ArrayList<String> result) {
+        if (idx == cs.length - 1) {
+            String curRes = String.valueOf(cs);
+            if (!result.contains(curRes)) {
+                result.add(curRes);
+            }
+        } else {
+            for (int j = idx; j < cs.length; ++j) {
+                swap(cs, j, idx);
+                permutationHelper(cs, idx+1, result);
+                swap(cs, j, idx);
+            }
+        }
+    }
+
+    private void swap(char [] arr, int i ,int j) {
+        char temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+
+    /**
+     * 剑指offer-28 出现次数超过一半的数字
+     * 投票算法
+     */
+    public int moreThanHalfNum_Solution(int [] array) {
+        if (array == null || array.length == 0) {
+            return 0;
+        }
+        Map<Integer, Integer> numToCnts = new HashMap<>();
+        int size = array.length;
+        for (int num: array) {
+            numToCnts.put(num, numToCnts.getOrDefault(num, 0) + 1);
+        }
+        for (Map.Entry<Integer, Integer> entry: numToCnts.entrySet()) {
+            if (entry.getValue() > size / 2) {
+                return entry.getKey();
+            }
+        }
+        return 0;
     }
 }
