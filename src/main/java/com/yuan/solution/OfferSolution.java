@@ -1,10 +1,14 @@
 package com.yuan.solution;
 
+import com.sun.deploy.util.StringUtils;
 import com.yuan.entity.ListNode;
 import com.yuan.entity.RandomListNode;
 import com.yuan.entity.TreeNode;
 
 import java.util.*;
+
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.MIN_VALUE;
 
 /**
  * @author yuan
@@ -712,7 +716,7 @@ public class OfferSolution {
      * 剑指offer-28 出现次数超过一半的数字
      * 投票算法
      */
-    public int moreThanHalfNum_Solution(int [] array) {
+    public int moreThanHalfNum(int [] array) {
         if (array == null || array.length == 0) {
             return 0;
         }
@@ -727,5 +731,140 @@ public class OfferSolution {
             }
         }
         return 0;
+    }
+
+    /**
+     * 剑指offer-29 最小的k个数
+     * 堆，快排改版
+     */
+    public ArrayList<Integer> getLeastNumbers(int [] input, int k) {
+        return null;
+    }
+
+    /**
+     * 剑指offer-30 连续子数组最大和
+     * 滑动窗口
+     */
+    public int findGreatestSumOfSubArray(int[] array) {
+        if (array == null || array.length == 0) {
+            return MIN_VALUE;
+        }
+        int max = MIN_VALUE;
+        int curSum = MIN_VALUE;
+        for (int num: array) {
+            if (curSum < 0) {
+                curSum = num;
+            } else {
+                curSum += num;
+            }
+            max = Math.max(curSum, max);
+        }
+        return max;
+    }
+
+    /**
+     * 剑指offer-31 整数中1出现次数
+     * 暴力解法
+     */
+    public int numberOf1Between1AndN(int n) {
+        int result = 0;
+        for (int i = 0; i <= n; i++) {
+            int cur = i;
+            while (cur != 0) {
+                if (cur % 10 == 1) {
+                    result++;
+                }
+                cur /= 10;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 剑指offer-32 数组排成最小的数
+     */
+    public String printMinNumber(int [] numbers) {
+        Integer[] arr = Arrays.stream(numbers).boxed().toArray(Integer[]::new);
+        Arrays.sort(arr, (o1, o2) -> {
+            String s1 = o1 + String.valueOf(o2);
+            String s2 = o2 + String.valueOf(o1);
+            return s1.compareTo(s2);
+        });
+        StringBuilder builder = new StringBuilder();
+        Arrays.stream(arr).forEach(builder::append);
+        return builder.toString();
+    }
+
+    /**
+     * 剑指offer-33 丑数
+     * 有点ugly
+     */
+    public int getUglyNumber(int index) {
+        if (index == 0) {
+            return 0;
+        }
+        List<Integer> uglyNums = Arrays.asList(1, 2, 3, 4, 5);
+        uglyNums = new ArrayList<>(uglyNums);
+        int idx2 = 2, idx3 = 2, idx5 = 4;
+        while (index > uglyNums.size()) {
+            int num2 = 2 * uglyNums.get(idx2);
+            while (uglyNums.contains(num2)) {
+                idx2++;
+                num2 = 2 * uglyNums.get(idx2);
+            }
+            int num3 = 3 * uglyNums.get(idx3);
+            while (uglyNums.contains(num3)) {
+                idx3++;
+                num3 = 3 * uglyNums.get(idx2);
+            }
+            int num5 = 5 * uglyNums.get(idx5);
+            while (uglyNums.contains(num5)) {
+                idx5++;
+                num5 = 5 * uglyNums.get(idx2);
+            }
+            if (num2 < num3) {
+                if (num2 < num5) {
+                    uglyNums.add(num2);
+                    idx2++;
+                } else {
+                    uglyNums.add(num5);
+                    idx5++;
+                }
+            } else {
+                if (num3 < num5) {
+                    uglyNums.add(num3);
+                    idx3++;
+                } else {
+                    uglyNums.add(num5);
+                    idx5++;
+                }
+            }
+        }
+        return uglyNums.get(index - 1);
+    }
+
+    /**
+     * 剑指offer-34 第一个只出现一次的字符
+     */
+    public int firstNotRepeatingChar(String str) {
+        if (str == null || str.isEmpty()) {
+            return -1;
+        }
+        Map<Character, Integer> charToOccIndex = new HashMap<>();
+        Set<Character> occChar = new HashSet<>();
+        int minIndex = MAX_VALUE;
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (occChar.contains(c)) {
+                charToOccIndex.remove(c);
+            } else {
+                occChar.add(c);
+                charToOccIndex.put(c, i);
+            }
+        }
+        for (Integer idx: charToOccIndex.values()) {
+            minIndex = Math.min(minIndex, idx);
+        }
+        return minIndex;
     }
 }

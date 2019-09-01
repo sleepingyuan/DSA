@@ -15,6 +15,6 @@ public class Main {
         root.left = new TreeNode(3);
         root.right = new TreeNode(2);
         root.right.right = new TreeNode(1);
-        System.out.println(offSol.findPath(root, 4));
+        System.out.println(offSol.getUglyNumber(11));
     }
 }
