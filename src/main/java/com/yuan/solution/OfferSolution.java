@@ -1,6 +1,7 @@
 package com.yuan.solution;
 
 import com.yuan.entity.ListNode;
+import com.yuan.entity.RandomListNode;
 import com.yuan.entity.TreeNode;
 
 import java.util.*;
@@ -607,5 +608,36 @@ public class OfferSolution {
         }
         fpPath.remove(fpPath.size() - 1);
         return fpResult;
+    }
+
+    /**
+     * 剑指offer-25 复杂链表的复制
+     */
+    public RandomListNode clone(RandomListNode pHead) {
+        if (pHead == null) {
+            return null;
+        }
+        Map<Integer, RandomListNode> random2ori = new HashMap<>();
+        RandomListNode cloneHead = new RandomListNode(pHead.label);
+        RandomListNode current = cloneHead;
+        while (pHead != null) {
+            if (random2ori.get(pHead.label) != null) {
+                current = random2ori.get(pHead.label);
+            } else {
+                current.label = pHead.label;
+                if (pHead.next != null) {
+                    current.next = new RandomListNode(pHead.next.label);
+                }
+                if (pHead.random != null) {
+                    current.random = new RandomListNode(pHead.random.label);
+                }
+            }
+            if (current.random != null) {
+                random2ori.put(current.random.label, current.random);
+            }
+            pHead = pHead.next;
+            current = current.next;
+        }
+        return cloneHead;
     }
 }
