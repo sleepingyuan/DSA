@@ -1,11 +1,12 @@
 package com.yuan.solution;
 
-import com.sun.deploy.util.StringUtils;
 import com.yuan.entity.ListNode;
 import com.yuan.entity.RandomListNode;
 import com.yuan.entity.TreeNode;
 
+import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
@@ -866,5 +867,114 @@ public class OfferSolution {
             minIndex = Math.min(minIndex, idx);
         }
         return minIndex;
+    }
+
+    /**
+     * 剑指offer-35 数组中的逆序对,对1000000007取模
+     * 维护一个有序数组，每次将新的数字插入到不大于它的最后一个数字
+     */
+    public int inversePairs(int [] array) {
+        if (array == null || array.length == 0) {
+            return 0;
+        }
+        ArrayList<Integer> orderedNums = new ArrayList<>();
+        int result = 0;
+        for (int num: array) {
+            int idx = binarySearchBack(orderedNums, num);
+            if (idx <= orderedNums.size() - 1 && orderedNums.get(idx) == num) {
+                idx++;
+            }
+            orderedNums.add(idx, num);
+            result += orderedNums.size() - idx - 1;
+            if (result >= 1000000007) {
+                result %= 1000000007;
+            }
+        }
+        return result;
+    }
+
+    private int binarySearchBack(ArrayList<Integer> ordered, int num) {
+        int lo = 0, hi = ordered.size();
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (ordered.get(mid) <= num) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        return lo;
+    }
+
+    /**
+     * 剑指offer-36 两个链表的第一个公共节点
+     * 两个指针，本地能通过，剑指offer不知道有什么问题
+     */
+    public ListNode findFirstCommonNode(ListNode pHead1, ListNode pHead2) {
+        if (pHead1 == null || pHead2 == null) {
+            return null;
+        }
+        ListNode traverse1 = pHead1;
+        ListNode traverse2 = pHead2;
+        while (traverse1 != traverse2) {
+            traverse1 = traverse1.next == null? pHead2: traverse1.next;
+            traverse2 = traverse2.next == null? pHead1: traverse2.next;
+        }
+        return traverse1;
+    }
+
+    /**
+     * 剑指offer-37 排序数组中出现的次数
+     * 两个二分
+     */
+    public int getNumberOfK(int [] array , int k) {
+        ArrayList<Integer> arrs = Arrays.stream(array).boxed().collect(Collectors.toCollection(ArrayList::new));
+        int lo = binarySearchForward(arrs, k);
+        int hi = binarySearchBack(arrs, k);
+        if (lo < array.length && array[lo] == k) {
+            return hi - lo;
+        } else {
+            return 0;
+        }
+    }
+
+    private int binarySearchForward(ArrayList<Integer> ordered, int num) {
+        int lo = 0, hi = ordered.size();
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (ordered.get(mid) < num) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        return lo;
+    }
+
+    /**
+     * 剑指offer-38 二叉树的深度
+     * 递归
+     */
+    public int treeDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return Math.max(treeDepth(root.left), treeDepth(root.right)) + 1;
+    }
+
+    /**
+     * 剑指offer-39 判断是不是平衡二叉树
+     * 递归 判断树的深度
+     */
+    public boolean isBalanced(TreeNode root) {
+        if (root == null) {
+            return true;
+        } else if (root.left == null && root.right == null){
+            return true;
+        } else {
+            // 左子树与右子树都为平衡二叉树，高度差小于1
+            return isBalanced(root.left) && isBalanced(root.right) && -1 <= treeDepth(root.left) - treeDepth(root.right)
+                    && treeDepth(root.left) - treeDepth(root.right) <= 1;
+        }
     }
 }
