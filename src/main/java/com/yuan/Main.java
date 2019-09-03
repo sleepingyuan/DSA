@@ -15,6 +15,6 @@ public class Main {
         OfferSolution offSol = new OfferSolution();
         int [] arrs = new int[]{1,3,3,3,3,4,5};
 
-        offSol.getNumberOfK(arrs, 6);
+        offSol.isContinuous(new int[]{1,3,2,6,4});
     }
 }

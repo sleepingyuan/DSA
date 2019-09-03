@@ -4,7 +4,6 @@ import com.yuan.entity.ListNode;
 import com.yuan.entity.RandomListNode;
 import com.yuan.entity.TreeNode;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -976,5 +975,165 @@ public class OfferSolution {
             return isBalanced(root.left) && isBalanced(root.right) && -1 <= treeDepth(root.left) - treeDepth(root.right)
                     && treeDepth(root.left) - treeDepth(root.right) <= 1;
         }
+    }
+
+    /**
+     * 剑指offer-40 数组中只出现一次的数字
+     * 第一次做异或，找出结果二进制为1的最右边一位
+     */
+    public void findNumsAppearOnce(int[] array, int[] num1, int[] num2) {
+        OptionalInt optionalInt = Arrays.stream(array).reduce((a, b) -> a ^ b);
+        int xor;
+        if (optionalInt.isPresent()) {
+            xor = optionalInt.getAsInt();
+        } else {
+            return;
+        }
+        int times = 0;
+        while ((xor & 1) == 0) {
+            xor >>= 1;
+            times++;
+        }
+        int [] result = new int[]{0, 0};
+        for (int num: array) {
+            int temp = num >> times;
+            if ((temp & 1) == 0) {
+                result[0] ^= num;
+            } else {
+                result[1] ^= num;
+            }
+        }
+        num1[0] = result[0];
+        num2[0] = result[1];
+    }
+
+    /**
+     * 剑指offer-41 和为S的连续正数序列
+     * 算平均数，注意Math.floor函数，ugly。。。。。。
+     */
+    public ArrayList<ArrayList<Integer>> findContinuousSequence(int sum) {
+        int totalNums = 1 + sum / 2;
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+        while (totalNums >= 2) {
+            if (totalNums % 2 == 0) {
+                float avg = (float)sum / totalNums;
+                if (avg - Math.floor(avg) == 0.5 && (int)avg - totalNums / 2 >= 0) {
+                    ArrayList<Integer> curNums = new ArrayList<>();
+                    for (int num = (int)avg + 1 - totalNums / 2; num <= (int)avg + totalNums / 2; num++) {
+                        curNums.add(num);
+                    }
+                    result.add(curNums);
+                }
+            } else {
+                if (sum % totalNums == 0) {
+                    int avg = sum / totalNums;
+                    if (avg - totalNums / 2 > 0) {
+                        ArrayList<Integer> curNums = new ArrayList<>();
+                        for (int num = avg - totalNums / 2; num <= avg + totalNums / 2; num++) {
+                            curNums.add(num);
+                        }
+                        result.add(curNums);
+                    }
+                }
+            }
+            totalNums--;
+        }
+        return result;
+    }
+
+    /**
+     * 剑指offer-42 和为S的两个数字
+     * 两个数字越相近，积越大
+     */
+    public ArrayList<Integer> findNumbersWithSum(int [] array,int sum) {
+        int fakeAvg = sum / 2;
+        int idx = 0;
+        while (idx < array.length - 1) {
+            if (array[idx] <= fakeAvg && fakeAvg < array[idx + 1]) {
+                break;
+            }
+            idx++;
+        }
+        int left = 0, right = array.length - 1;
+        while (left < right) {
+            if (array[left] + array[right] == sum) {
+                return Arrays.stream(new int[]{array[left],
+                        array[right]}).boxed().collect(Collectors.toCollection(ArrayList::new));
+            } else if (array[left] + array[right] < sum) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 剑指offer-43 左旋转字符串
+     */
+    public String LeftRotateString(String str,int n) {
+        if (str == null || str.length() == 0) {
+            return "";
+        }
+        n = n % str.length();
+        return str.substring(n) + str.substring(0, n);
+    }
+
+    /**
+     * 剑指offer-44 翻转字符串
+     */
+    public String reverseSentence(String str) {
+        if (str == null || "".equals(str.trim())) {
+            return str;
+        }
+        String[] strs = str.split(" ");
+        Optional<String> result = Arrays.stream(strs).reduce((a, b) -> (b + " " + a));
+        return result.orElse("");
+    }
+
+    /**
+     * 剑指offer-45 扑克牌顺子
+     */
+    public boolean isContinuous(int[] numbers) {
+        if (numbers == null || numbers.length == 0) {
+            return false;
+        }
+        Arrays.sort(numbers);
+        int idx = 0;
+        while (idx < numbers.length) {
+            if (numbers[idx] != 0) {
+                break;
+            }
+            idx++;
+        }
+        int replacedNums = idx;
+        while (idx < numbers.length - 1) {
+            if (numbers[idx + 1] == numbers[idx]) {
+                return false;
+            }
+            replacedNums -= numbers[idx + 1] - numbers[idx] - 1;
+            if (replacedNums < 0) {
+                return false;
+            }
+            idx++;
+        }
+        return true;
+    }
+
+    /**
+     * 剑指offer-46 圆圈中最后剩下的数
+     * 用LinkedList
+     */
+    public int lastRemaining(int n, int m) {
+        LinkedList<Integer> nodes = new LinkedList<>();
+        for (int i = 0; i < n; i ++) {
+            nodes.add(i);
+        }
+        int rmIdx = 0;
+        while (nodes.size() > 1) {
+            rmIdx = (rmIdx + m - 1) % nodes.size();
+            nodes.remove(rmIdx);
+        }
+        return nodes.size() == 1 ? nodes.get(0) : -1;
     }
 }
