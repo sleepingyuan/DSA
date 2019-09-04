@@ -3,6 +3,7 @@ package com.yuan.solution;
 import com.yuan.entity.ListNode;
 import com.yuan.entity.RandomListNode;
 import com.yuan.entity.TreeNode;
+import sun.util.resources.cldr.zh.CalendarData_zh_Hans_HK;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1135,5 +1136,101 @@ public class OfferSolution {
             nodes.remove(rmIdx);
         }
         return nodes.size() == 1 ? nodes.get(0) : -1;
+    }
+
+    /**
+     * 剑指offer-47 求1到n的和，不能用乘除法 循环 条件判断
+     */
+    public int sumN(int n) {
+        int result = n;
+        boolean c = n > 0 && ((result += sumN(n - 1)) > 0);
+        return result;
+    }
+
+    /**
+     * 剑指offer-48 两个整数之和，不能+ - * /
+     * 按位与 左移一位，是进位，按位异或是不带进位的加法
+     */
+    public int add(int num1,int num2) {
+        int carry = (num1 & num2) << 1;
+        int xor = num1 ^ num2;
+        while (carry != 0) {
+            int num = xor ^ carry;
+            carry = (xor & carry) << 1;
+            xor = num;
+        }
+        return xor;
+    }
+
+    /**
+     * 剑指offer-49 字符串转换为整数
+     */
+    public int strToInt(String str) {
+        if (str == null || str.length() == 0) {
+            return 0;
+        }
+        boolean isPositive = true;
+        int idx;
+        if (str.charAt(0) == '-' || str.charAt(0) == '+') {
+            if (str.length() == 1) {
+                return 0;
+            } else {
+                isPositive = (str.charAt(0) != '-');
+                idx = 1;
+            }
+        } else {
+            idx = 0;
+        }
+        int result = 0;
+        while (idx < str.length()) {
+            if (str.charAt(idx) >= '0' && str.charAt(idx) <= '9') {
+                result = 10 * result + (int)str.charAt(idx) - '0';
+            } else {
+                return 0;
+            }
+            idx++;
+        }
+        return isPositive? result: -1 * result;
+    }
+
+    /**
+     * 剑指offer-50 返回重复的任意一个
+     */
+    public boolean duplicate(int[] numbers, int length, int[] duplication) {
+        if (length == 0) {
+            return false;
+        }
+        Set<Integer> occured = new HashSet<>();
+        for (int num: numbers) {
+            if (occured.contains(num)) {
+                duplication[0] = num;
+                return true;
+            } else {
+                occured.add(num);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 剑指offer-51 构建乘积数组
+     * 构建两个数组
+     */
+    public int[] multiply(int[] a) {
+        if (a == null || a.length == 0) {
+            return a;
+        }
+        int[] result = new int[a.length];
+        int[] helperLeft = new int[a.length];
+        int[] helperRight = new int[a.length];
+        helperLeft[0] = helperRight[a.length - 1] = 1;
+        for (int i = 1; i < a.length; i++) {
+            helperLeft[i] = helperLeft[i - 1] * a[i - 1];
+            helperRight[a.length - 1 - i] = helperRight[a.length - i] * a[a.length - i];
+        }
+        for (int i = 0; i < result.length; i++) {
+            result[i] = helperLeft[i] * helperRight[i];
+        }
+        return result;
     }
 }
