@@ -1,20 +1,15 @@
 package com.yuan;
 
-import com.yuan.entity.ListNode;
-import com.yuan.entity.TreeNode;
-import com.yuan.solution.LeetcodeSolution;
+
 import com.yuan.solution.OfferSolution;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        LeetcodeSolution lcSol = new LeetcodeSolution();
         OfferSolution offSol = new OfferSolution();
-        int [] arrs = new int[]{1,3,3,3,3,4,5};
-
-        offSol.isContinuous(new int[]{1,3,2,6,4});
+        int[] input = new int[]{4,5,1,6,2,7,3,8,-3};
+        ArrayList<Integer> leastNumbers = offSol.getLeastNumbers(input, 6);
+        System.out.println(leastNumbers);
     }
 }

@@ -3,7 +3,6 @@ package com.yuan.solution;
 import com.yuan.entity.ListNode;
 import com.yuan.entity.RandomListNode;
 import com.yuan.entity.TreeNode;
-import sun.util.resources.cldr.zh.CalendarData_zh_Hans_HK;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -739,7 +738,43 @@ public class OfferSolution {
      * 堆，快排改版
      */
     public ArrayList<Integer> getLeastNumbers(int [] input, int k) {
-        return null;
+        if (input == null || input.length < k || k == 0) {
+            return new ArrayList<>();
+        }
+        int curPivotIdx = -1, lo = 0, hi = input.length - 1;
+        while (curPivotIdx != k - 1) {
+            curPivotIdx = quickSort(input, lo, hi);
+            if (curPivotIdx < k - 1) {
+                lo = curPivotIdx + 1;
+            } else {
+                hi = curPivotIdx - 1;
+            }
+        }
+        return Arrays.stream(Arrays.copyOfRange(input, 0, curPivotIdx + 1)).boxed().collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private int quickSort(int[] input, int lo, int hi) {
+        int pivotIdx = (int)(Math.random() * 100) % (hi - lo + 1);
+        swap(input, lo, pivotIdx);
+        int pivot = input[lo];
+        while (lo < hi) {
+            while (lo < hi && pivot <= input[hi]) {
+                hi--;
+            }
+            input[lo] = input[hi];
+            while (lo < hi && input[lo] <= pivot) {
+                lo++;
+            }
+            input[hi] = input[lo];
+        }
+        input[lo] = pivot;
+        return lo;
+    }
+
+    private void swap(int[] input, int i, int j) {
+        int temp = input[i];
+        input[i] = input[j];
+        input[j] = temp;
     }
 
     /**
