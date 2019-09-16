@@ -2,6 +2,7 @@ package com.yuan.solution;
 
 import com.yuan.entity.ListNode;
 import com.yuan.entity.RandomListNode;
+import com.yuan.entity.TreeLinkNode;
 import com.yuan.entity.TreeNode;
 
 import java.util.*;
@@ -1268,4 +1269,301 @@ public class OfferSolution {
         }
         return result;
     }
+
+    /**
+     * 剑指offer-52 正则匹配
+     */
+    public boolean match(char[] str, char[] pattern)
+    {
+        if (pattern == null || pattern.length == 0) {
+            return str != null && str.length == 0;
+        }
+        if (pattern.length == 1) {
+            return (str.length == 1 && (pattern[0] == str[0] || pattern[0] == '.'));
+        }
+        if (pattern[1] != '*') {
+            return (str[0] == pattern[0] || pattern[0] == '.') && match(Arrays.copyOfRange(str, 1, str.length)
+                    , Arrays.copyOfRange(pattern, 1, pattern.length));
+        }
+        while (str.length != 0 && (str[0] == pattern[0] || pattern[0] == '.')) {
+            if (match(str, Arrays.copyOfRange(pattern, 2, pattern.length))) {
+                return true;
+            }
+            str = Arrays.copyOfRange(str, 1, str.length);
+        }
+        return match(str, Arrays.copyOfRange(pattern, 2, pattern.length));
+    }
+
+    /**
+     * 剑指offer-54 字符流第一个不重复的字符
+     */
+    private List<Character> appeared = new ArrayList<>();
+
+    public void insert(char ch)
+    {
+        appeared.add(ch);
+    }
+    public char firstAppearingOnce()
+    {
+        HashMap<Character, Integer> occTimes = new HashMap<>();
+        appeared.forEach(ch->occTimes.put(ch, occTimes.getOrDefault(ch, 0) + 1));
+        for (Character ch: appeared) {
+            if (occTimes.get(ch) == 1) {
+                return ch;
+            }
+        }
+        return '#';
+    }
+
+    /**
+     * 剑指offer-55 找到环的入口节点
+     */
+    public ListNode entryNodeOfLoop(ListNode pHead)
+    {
+        if (pHead == null || pHead.next == null) {
+            return null;
+        }
+        ListNode fast = pHead, slow = pHead;
+        fast = fast.next.next;
+        slow = slow.next;
+        while (fast != null && fast.next.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (slow == fast) {
+                slow = pHead;
+                while (slow != fast) {
+                    slow = slow.next;
+                    fast = fast.next;
+                }
+                return slow;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 剑指offer-56 删除重复节点
+     * 排序的链表 删除重复节点 所有的节点都要删除
+     */
+    public ListNode deleteDuplication(ListNode pHead)
+    {
+        ListNode pre = new ListNode(0);
+        pre.next = pHead;
+        ListNode cur = pre;
+        while (cur.next != null && cur.next.next!=null) {
+            if (cur.next.val == cur.next.next.val) {
+                ListNode temp = cur.next.next.next;
+                while (temp != null && cur.next.val == temp.val) {
+                    temp = temp.next;
+                }
+                cur.next = temp;
+            } else {
+                cur = cur.next;
+            }
+        }
+        return pre.next;
+    }
+
+    /**
+     * 剑指offer-57 二叉树的下一个节点
+     */
+    public TreeLinkNode getNext(TreeLinkNode pNode)
+    {
+        if (pNode == null) {
+            return null;
+        }
+        if (pNode.right != null) {
+            pNode = pNode.right;
+            while (pNode.left != null) {
+                pNode = pNode.left;
+            }
+            return pNode;
+        }
+        while (pNode.next != null) {
+            TreeLinkNode parent = pNode.next;
+            if (parent.left == pNode) {
+                return parent;
+            } else {
+                pNode = parent;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 剑指offer-58 对称的二叉树
+     */
+    public boolean isSymmetrical(TreeNode pRoot)
+    {
+        if (pRoot == null) {
+            return true;
+        }
+        return isSynmmetircalHelper(pRoot.left, pRoot.right);
+    }
+
+    private boolean isSynmmetircalHelper(TreeNode left, TreeNode right) {
+        if (left == null) {
+            return right == null;
+        }
+        if (right == null) {
+            return false;
+        }
+        if (left.val != right.val) {
+            return false;
+        }
+        return isSynmmetircalHelper(left.left, right.right) && isSynmmetircalHelper(left.right, right.left);
+    }
+
+    /**
+     * 剑指offer-59 之字形打印二叉树
+     */
+    public ArrayList<ArrayList<Integer> > printNode(TreeNode pRoot) {
+        if (pRoot == null) {
+            return new ArrayList<>();
+        }
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+        Stack<TreeNode> curLayer = new Stack<>();
+        Stack<TreeNode> nextLayer = new Stack<>();
+        nextLayer.add(pRoot);
+        boolean isReverse = false;
+        while (!curLayer.isEmpty() || !nextLayer.isEmpty()) {
+            curLayer = nextLayer;
+            nextLayer = new Stack<>();
+            ArrayList<Integer> curLayerResu = new ArrayList<>();
+            while (!curLayer.isEmpty()) {
+                TreeNode curNode = curLayer.pop();
+                curLayerResu.add(curNode.val);
+                if (isReverse) {
+                    if (curNode.right != null) {
+                        nextLayer.add(curNode.right);
+                    }
+                    if (curNode.left != null) {
+                        nextLayer.add(curNode.left);
+                    }
+                } else {
+                    if (curNode.left != null) {
+                        nextLayer.add(curNode.left);
+                    }
+                    if (curNode.right != null) {
+                        nextLayer.add(curNode.right);
+                    }
+                }
+            }
+            isReverse = !isReverse;
+            result.add(curLayerResu);
+        }
+        return result;
+    }
+
+    /**
+     * 剑指offer-60 从上到下打印二叉树
+     */
+    ArrayList<ArrayList<Integer> > printLayer(TreeNode pRoot) {
+        if (pRoot == null) {
+            return new ArrayList<>();
+        }
+        LinkedList<TreeNode> nodes = new LinkedList<>();
+        int layerSize, nextLayerSize = 1;
+        nodes.add(pRoot);
+        ArrayList<ArrayList<Integer> > result = new ArrayList<>();
+        while (nextLayerSize != 0) {
+            layerSize = nextLayerSize;
+            nextLayerSize = 0;
+            int idx = 0;
+            TreeNode node = nodes.pop();
+            ArrayList<Integer> curLayerResu = new ArrayList<>();
+            for (;;node = nodes.pop()) {
+               curLayerResu.add(node.val);
+               if (node.left != null) {
+                   nodes.add(node.left);
+                   ++nextLayerSize;
+               }
+               if (node.right != null) {
+                   nodes.add(node.right);
+                   ++nextLayerSize;
+               }
+               if (layerSize <= ++idx) {
+                   break;
+               }
+            }
+            result.add(curLayerResu);
+        }
+        return result;
+    }
+
+    /**
+     * 剑指offer-61 序列化和反序列化二叉树
+     */
+    String serialize(TreeNode root) {
+        if (root == null) {
+            return "";
+        }
+        LinkedList<TreeNode> nodes = new LinkedList<>();
+        StringBuilder builder = new StringBuilder();
+        nodes.add(root);
+        while (!nodes.isEmpty()) {
+            TreeNode node = nodes.pop();
+            if (node != null) {
+                builder.append(node.val);
+            } else {
+                builder.append('#');
+            }
+            if (node == null) {
+                continue;
+            }
+            if (node.left != null) {
+                nodes.add(node.left);
+            } else {
+                nodes.add(null);
+            }
+            if (node.right != null) {
+                nodes.add(node.right);
+            } else {
+                nodes.add(null);
+            }
+        }
+        return builder.toString();
+    }
+
+    public TreeNode deSerialize(String str) {
+        if ("".equals(str)) {
+            return null;
+        }
+        int nextLayerSize = 0, validSize = 1;
+        LinkedList<TreeNode> nodes = new LinkedList<>();
+        nodes.add(new TreeNode(str.charAt(0) - '0'));
+        TreeNode result = nodes.peek();
+        nextLayerSize = 2 * validSize;
+        int iterIdx = 1;
+        for (;iterIdx < str.length(); iterIdx += nextLayerSize) {
+            String curLayer = str.substring(iterIdx, iterIdx + nextLayerSize);
+            validSize = curLayer.length() - getOccTimesOfChar(curLayer, '#');
+            for (int i = 0; i < curLayer.length(); i += 2) {
+                TreeNode node = nodes.pop();
+                if (str.charAt(i) != '#') {
+                    TreeNode newNode = new TreeNode(str.charAt(i) - '0');
+                    nodes.add(newNode);
+                    node.left = newNode;
+                }
+                if (str.charAt(i + 1) != '#') {
+                    TreeNode newNode = new TreeNode(str.charAt(i + 1) - '0');
+                    nodes.add(newNode);
+                    node.right = newNode;
+                }
+            }
+            nextLayerSize = 2 * validSize;
+        }
+        return result;
+    }
+
+    private int getOccTimesOfChar(String s, char target) {
+        int result = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (target == s.charAt(i)) {
+                result++;
+            }
+        }
+        return result;
+    }
+
 }
