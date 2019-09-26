@@ -8,8 +8,7 @@ import com.yuan.entity.TreeNode;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
+import static java.lang.Integer.*;
 
 /**
  * @author yuan
@@ -1564,6 +1563,52 @@ public class OfferSolution {
             }
         }
         return result;
+    }
+
+    /**
+     * 滑动窗口最大值
+     */
+    public ArrayList<Integer> maxInWindows(int [] num, int size)
+    {
+        if (num == null || num.length < size || size == 0) {
+            return new ArrayList<>();
+        }
+        ArrayList<Integer> maxNums = new ArrayList<>();
+        LinkedList<Integer> maxIdxs = new LinkedList<>();
+        maxIdxs.add(0);
+        for (int i = 1; i < size; i++) {
+            Integer id = maxIdxs.getLast();
+            while (num[id] < num[i]) {
+                maxIdxs.removeLast();
+                if (maxIdxs.isEmpty()) {
+                    break;
+                }
+                id = maxIdxs.getLast();
+            }
+            maxIdxs.add(i);
+        }
+        maxNums.add(num[maxIdxs.getFirst()]);
+        for (int i = size; i < num.length; i++) {
+            int stIdx = i - size + 1;
+            while (!maxIdxs.isEmpty() && maxIdxs.getFirst() < stIdx) {
+                maxIdxs.removeFirst();
+            }
+            while (!maxIdxs.isEmpty()) {
+                int id = maxIdxs.getLast();
+                if (id < stIdx) {
+                    maxIdxs.removeLast();
+                    continue;
+                }
+                if (num[id] <= num[i]) {
+                    maxIdxs.removeLast();
+                } else {
+                    break;
+                }
+            }
+            maxIdxs.add(i);
+            maxNums.add(num[maxIdxs.getFirst()]);
+        }
+        return maxNums;
     }
 
 }

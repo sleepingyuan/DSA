@@ -125,5 +125,4 @@ public class Baidu {
         }
         System.out.println(result);
     }
-
 }
